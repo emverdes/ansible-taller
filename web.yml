@@ -53,7 +53,7 @@
       group: apache
 
   - name: Abro puertos en el firewall
-    firewalld:
+    ansible.posix.firewalld:
       service: "{{ item  }}"
       permanent: yes
       state: enabled
