@@ -1,0 +1,80 @@
+---
+- hosts: webserver
+  remote_user: admin
+  become: yes
+  become_method: sudo
+  vars:
+    paquetes:
+      - httpd
+      - php
+      - mariadb
+      - mariadb-server
+    sitio: ejemplo
+    servidor: www.ejemplo.com.uy
+    hostmaster: admin@ejemplo.com.uy
+
+  tasks:
+  - name: Paquetes instalados
+    yum:
+      name: "{{ paquetes }}"
+      state: latest
+
+  - name: Creo directorio para virtualhosts
+    file:
+      path: /etc/httpd/vhost.d
+      state: directory
+      mode: '0755'
+      owner: root
+
+  - name: Agrego directorio para vhost a configuracion
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      line: IncludeOptional vhost.d/*.conf
+
+  - name: Crear directorios para el sitio
+    file:
+      path: "{{ item }}"
+      recurse: yes
+      state: directory
+      owner: apache
+      group: apache
+      mode: 0755
+    loop:
+      - /var/www/"{{ sitio }}"
+      - /var/www/"{{ sitio }}"/html
+      - /var/www/"{{ sitio }}"/icons
+      - /var/www/"{{ sitio }}"/cgi-bin
+      - /var/www/"{{ sitio }}"/error
+
+  - name: Crear configuracion de virtualhost
+    template:
+      src: ./templates/{{ sitio }}.j2
+      dest: /etc/httpd/conf/vhost.d/{{ sitio }}.conf
+      owner: root
+      mode: '0644'
+    notify: Reinicio apache
+
+  - name: Copiar archivo indice al sitio
+    template:
+      src: ./templates/index.j2
+      dest: /var/www/index.html
+      owner: apache
+      group: apache
+
+  - name: Abro puertos en el firewall
+    firewalld:
+      service: "{{ item  }}"
+      permanent: yes
+      state: enabled
+      immediate: yes
+      zone: internal
+    loop:
+      - http
+      - https
+
+  handlers:
+  - name: Reinicio apache
+    service:
+      name: httpd
+      state: restarted
+      enabled: yes

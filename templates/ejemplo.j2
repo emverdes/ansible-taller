@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+  ServerName {{ servidor }}
+  ServerAdmin {{ hostmaster }}
+  DocumentRoot /var/www/{{ sitio }}/html
+  CustomLog /var/log/httpd/{{ sitio }}_access.log combined
+  ErrorLog /var/log/httpd/{{ sitio }}_error.log
+  <Directory /var/www/{{ sitio }}/html>
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+  </Directory>
+</VirtualHost>

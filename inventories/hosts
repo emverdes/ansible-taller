@@ -1,7 +1,2 @@
-[mailserver]
-192.168.1.1
-
-[mailserver:vars]
-hostname=correo.ejemplo.com.uy
-domain=ejemplo.com.uy
-networks=127.0.0.0/8, 192.168.1.0/24
+[webserver]
+192.168.1.1 ansible_host=www.ejemplo.com.uy
