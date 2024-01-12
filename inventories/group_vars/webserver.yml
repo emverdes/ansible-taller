@@ -1,0 +1,9 @@
+---
+paquetes:
+  - httpd
+  - php
+  - mariadb
+  - mariadb-server
+sitio: ejemplo
+servidor: www.ejemplo.com.uy
+hostmaster: admin@ejemplo.com.uy
